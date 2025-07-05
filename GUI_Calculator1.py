@@ -1,90 +1,93 @@
 import tkinter as tk
-from tkinter import ttk, messagebox
- 
-# --- FUNCTIONS ---
-def perform_operation():
-    if entry1.get().strip() == "" or entry2.get().strip() == "":
-        messagebox.showwarning("⚠️ Missing Input", "Please enter both numbers!")
-        return
+from tkinter import messagebox
 
+# Try to import a custom font if available
+try:
+    from tkinter import font as tkfont
+except:
+    tkfont = None
+
+root = tk.Tk()
+root.title("⚡ AI Neon Calculator")
+root.geometry("500x500")
+root.config(bg="#0d0d0d")  # Dark futuristic background
+
+# Fancy font setup
+main_font = ("Segoe UI", 11)
+if tkfont:
+    if "Orbitron" in tkfont.families():
+        main_font = ("Orbitron", 11)
+
+# Neon-style colors
+neon_blue = "#00ffff"
+neon_pink = "#ff2cd4"
+
+# Entry fields
+entry1 = tk.Entry(root, font=("Consolas", 16), bg="#111", fg=neon_blue, insertbackground=neon_blue, bd=0, highlightthickness=2, highlightcolor=neon_blue)
+entry1.place(x=100, y=60, width=300, height=40)
+
+entry2 = tk.Entry(root, font=("Consolas", 16), bg="#111", fg=neon_blue, insertbackground=neon_blue, bd=0, highlightthickness=2, highlightcolor=neon_blue)
+entry2.place(x=100, y=120, width=300, height=40)
+
+# Operation variable
+operation = tk.IntVar()
+
+# Custom radio buttons
+operations = [("➕", 1), ("➖", 2), ("✖", 3), ("➗", 4)]
+for i, (text, val) in enumerate(operations):
+    rb = tk.Radiobutton(root, text=text, variable=operation, value=val, font=("Arial", 16), fg=neon_pink,
+                        selectcolor="#222", bg="#0d0d0d", activebackground="#0d0d0d", activeforeground=neon_blue)
+    rb.place(x=120 + (i * 70), y=190)
+
+# Result label
+result_label = tk.Label(root, text="Result will appear here", font=("Segoe UI", 13, "bold"), fg=neon_blue, bg="#0d0d0d")
+result_label.place(x=120, y=300)
+
+# Glow button
+hover_effect = {"bg": neon_pink, "fg": "#000"}
+def on_enter(e):
+    calc_btn.config(**hover_effect)
+def on_leave(e):
+    calc_btn.config(bg=neon_blue, fg="#000")
+
+def perform_operation():
     try:
         n1 = float(entry1.get())
         n2 = float(entry2.get())
-    except ValueError:
-        messagebox.showerror("❌ Invalid Input", "Please enter valid numbers!")
-        return
+        op = operation.get()
 
-    if radio_var.get() == 0:
-        messagebox.showwarning("⚠️ No Operation", "Please select an operation!")
-        return
-
-    if radio_var.get() == 1:
-        result = n1 + n2
-    elif radio_var.get() == 2:
-        result = n1 - n2
-    elif radio_var.get() == 3:
-        result = n1 * n2
-    elif radio_var.get() == 4:
-        if n2 == 0:
-            messagebox.showerror("❌ Math Error", "Division by zero not allowed!")
+        if op == 0:
+            messagebox.showwarning("⚠️", "Please select an operation")
             return
-        result = n1 / n2
 
-    result_label.config(text=f"🧠 Result: {result}")
+        result = 0
+        if op == 1:
+            result = n1 + n2
+        elif op == 2:
+            result = n1 - n2
+        elif op == 3:
+            result = n1 * n2
+        elif op == 4:
+            if n2 == 0:
+                messagebox.showerror("❌ Error", "Cannot divide by zero")
+                return
+            result = n1 / n2
 
+        result_label.config(text=f"💡 Result: {round(result, 3)}")
 
-# --- MAIN WINDOW ---
-root = tk.Tk()
-root.title("🧠Calculator")
-root.geometry("400x400")
-root.configure(bg="#1f1f1f")
+    except ValueError:
+        messagebox.showerror("❌ Error", "Please enter valid numbers")
 
-style = ttk.Style(root)
-style.theme_use("clam")
-
-# --- STYLES ---
-style.configure("TLabel", background="#1f1f1f", foreground="#ffffff", font=("Helvetica", 11))
-style.configure("TButton", font=("Helvetica", 11, "bold"), padding=6)
-style.configure("TRadiobutton", background="#1f1f1f", foreground="#ffffff", font=("Helvetica", 10))
-
-# --- INPUTS FRAME ---
-frame = ttk.Frame(root, padding=20)
-frame.pack(pady=20)
-
-ttk.Label(frame, text="Enter First Number:").grid(row=0, column=0, sticky="w", pady=5)
-entry1 = ttk.Entry(frame, width=20)
-entry1.grid(row=0, column=1)
-
-ttk.Label(frame, text="Enter Second Number:").grid(row=1, column=0, sticky="w", pady=5)
-entry2 = ttk.Entry(frame, width=20)
-entry2.grid(row=1, column=1)
-
-# --- RADIO BUTTONS ---
-radio_var = tk.IntVar(value=0)
-ttk.Label(frame, text="Select Operation:").grid(row=2, column=0, sticky="w", pady=(15, 5))
-
-ops = [("➕ Add", 1), ("➖ Subtract", 2), ("✖️ Multiply", 3), ("➗ Divide", 4)]
-
-for i, (text, val) in enumerate(ops):
-    ttk.Radiobutton(frame, text=text, variable=radio_var, value=val).grid(row=3+i//2, column=i%2, sticky="w", padx=10, pady=2)
-
-# --- BUTTON ---
-def on_enter(e):
-    calc_btn.configure(style="Hover.TButton")
-
-def on_leave(e):
-    calc_btn.configure(style="TButton")
-
-style.configure("Hover.TButton", background="#00ffcc", foreground="#000", font=("Helvetica", 11, "bold"))
-
-calc_btn = ttk.Button(root, text="✨ Calculate", command=perform_operation)
-calc_btn.pack(pady=15)
+# Fancy button
+calc_btn = tk.Button(root, text="⚡ Calculate", font=("Orbitron", 14, "bold"), bg=neon_blue, fg="#000",
+                     activebackground=neon_pink, bd=0, padx=20, pady=10, command=perform_operation)
+calc_btn.place(x=180, y=240)
 calc_btn.bind("<Enter>", on_enter)
 calc_btn.bind("<Leave>", on_leave)
 
-# --- RESULT ---
-result_label = ttk.Label(root, text="Result will appear here", font=("Helvetica", 12, "bold"))
-result_label.pack(pady=10)
+# Drop-shadow glow simulation (just for look)
+shadow = tk.Label(root, bg=neon_blue, width=40, height=2)
+shadow.place(x=160, y=400)
 
 root.mainloop()
 
